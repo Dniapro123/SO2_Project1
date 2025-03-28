@@ -1,8 +1,9 @@
 # ninja log v5
-3	233	7647902034514277	build.ninja	1e749bd6c96d65b9
-3	584	7647836211354126	CMakeFiles/Projekt1_2.dir/dining_philosophers.cpp.obj	c0a8aea8a3c8736e
-585	692	7647836212405012	Projekt1_2.exe	a817e22a65eff93c
-5	750	7647939234922426	CMakeFiles/Projekt1_2.dir/dining_philosophers.cpp.obj	c0a8aea8a3c8736e
-750	1043	7647939237827592	Projekt1_2.exe	a817e22a65eff93c
+3	233	7648466596567155	build.ninja	1e749bd6c96d65b9
 2	2109	7648186054746763	CMakeFiles/Projekt1_2.dir/dining_philosophers.cpp.obj	c0a8aea8a3c8736e
 2109	2438	7648186057993991	Projekt1_2.exe	a817e22a65eff93c
+8	622	7648466596567155	build.ninja	1e749bd6c96d65b9
+1	1347	7648466611931117	CMakeFiles/Projekt1_2.dir/dining_philosophers.cpp.obj	c0a8aea8a3c8736e
+1347	1743	7648466615853405	Projekt1_2.exe	a817e22a65eff93c
+5	730	7648486753581976	CMakeFiles/Projekt1_2.dir/dining_philosophers.cpp.obj	c0a8aea8a3c8736e
+730	884	7648486755092574	Projekt1_2.exe	a817e22a65eff93c

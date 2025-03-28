@@ -2,6 +2,8 @@
 #include <thread>
 #include <vector>
 #include <chrono>
+#include <mutex>
+#include <condition_variable>
 
 using namespace std;
 
@@ -13,14 +15,14 @@ class DiningPhilosophers {
 private:
     int numPhilosophers;
     vector<thread> philosophers;
-    vector<int> state;  // Status: 0 = THINKING, 1 = HUNGRY, 2 = EATING
-    vector<bool> forks; // true = wolne, false = zajęte
+    vector<int> state;
+    vector<mutex> forks; // Mutex for each fork
+    mutex mtx; // Global mutex for synchronizing philosophers' state
+    vector<condition_variable> cv; // Condition variables for philosophers
 
 public:
-    // Constructor - initializes philosophers' states and forks
-    DiningPhilosophers(int n) : numPhilosophers(n), state(n, THINKING), forks(n, true) {}
+    DiningPhilosophers(int n) : numPhilosophers(n), state(n, THINKING), forks(n), cv(n) {}
 
-    // Function executed by each philosopher thread
     void philosopher(int id) {
         for (int i = 0; i < 5; ++i) { // Each philosopher eats 5 times
             think(id);
@@ -30,64 +32,53 @@ public:
         }
     }
 
-    // Simulates the thinking process
     void think(int id) {
         printState(id, "Thinking");
-        this_thread::sleep_for(chrono::milliseconds(1000)); // Thinking for 1 second
+        this_thread::sleep_for(chrono::milliseconds(1000));
     }
 
-    // Philosopher tries to pick up forks
     void pickupForks(int id) {
-        int left = id;
-        int right = (id + 1) % numPhilosophers;
-
+        unique_lock<mutex> lock(mtx); // Lock access to state modification
         state[id] = HUNGRY;
         printState(id, "Hungry");
 
-        // Wait until both forks are available
-        while (true) {
-            if (forks[left] && forks[right]) {
-                forks[left] = false;
-                forks[right] = false;
-                state[id] = EATING;
-                break;
-            }
-            this_thread::sleep_for(chrono::milliseconds(100)); // Prevent excessive CPU usage
-        }
+        // Wait until the philosopher can pick up both forks
+        cv[id].wait(lock, [&] {
+            int left = id;
+            int right = (id + 1) % numPhilosophers;
+            return (state[left] != EATING && state[right] != EATING);
+        });
 
+        // The philosopher can start eating
+        state[id] = EATING;
         printState(id, "Eating");
     }
 
-    // Simulates eating
     void eat(int id) {
-        this_thread::sleep_for(chrono::milliseconds(2000)); // Eating for 2 seconds
+        this_thread::sleep_for(chrono::milliseconds(2000));
     }
 
-    // Philosopher puts down forks
     void putdownForks(int id) {
-        int left = id;
-        int right = (id + 1) % numPhilosophers;
-
-        forks[left] = true;
-        forks[right] = true;
+        lock_guard<mutex> lock(mtx); // Secure fork release operation
         state[id] = THINKING;
-
         printState(id, "Thinking");
+
+        // Notify neighbors that they may attempt to eat
+        cv[(id + numPhilosophers - 1) % numPhilosophers].notify_one();
+        cv[(id + 1) % numPhilosophers].notify_one();
     }
 
-    // Prints the philosopher's state
     void printState(int id, const string &state) {
         cout << "Philosopher " << id << " is " << state << endl;
     }
 
-    // Starts the simulation
     void start() {
         for (int i = 0; i < numPhilosophers; ++i) {
             philosophers.emplace_back(&DiningPhilosophers::philosopher, this, i);
         }
 
         for (auto &p : philosophers) {
-            p.join(); // Wait for all philosopher threads to finish
+            p.join();
         }
     }
 };
@@ -95,18 +86,15 @@ public:
 int main() {
     int numPhilosophers;
 
-    // User input
     cout << "=== Dining Philosophers Problem ===" << endl;
     cout << "Enter the number of philosophers: ";
     cin >> numPhilosophers;
 
-    // Validate input
     if (numPhilosophers < 2) {
         cout << "Number of philosophers must be at least 2!" << endl;
         return 1;
     }
 
-    // Run simulation
     DiningPhilosophers dp(numPhilosophers);
     dp.start();
 

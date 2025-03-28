@@ -7,7 +7,7 @@ Temat:Problem jedzących filozofów
 Data:25.03.2025
 
 
-OPIS PROJEKTU:
+**Opis projektu:**
 Problem jedzących filozofów stanowi model rzeczywistych problemów współdzielenia zasobów w systemach operacyjnych, takich jak:
 
 Deadlock (Zakleszczenie)
@@ -20,7 +20,7 @@ Może się zdarzyć, jeśli filozof nigdy nie dostanie obu widelców, ponieważ 
 Race Condition (Warunki wyścigu)
 Gdy kilku filozofów próbuje podnieść te same widelce w tym samym czasie, może dojść do niespójnego stanu.
 
-RODZAJE AKCJI:
+**Rodzaje akcji:**
 Wyobraźmy sobie okrągły stół, przy którym siedzi N filozofów. Każdy filozof cyklicznie przechodzi przez trzy stany:
 
 Myślenie (Thinking) – Filozof zastanawia się nad problemami filozoficznymi i nie potrzebuje zasobów.
@@ -33,18 +33,22 @@ Przy stole znajduje się dokładnie N widelców (jeden między każdym dwoma fil
 musi jednocześnie zdobyć dwa sąsiadujące widelce – ten po lewej i ten po prawej stronie.
 Po skończonym posiłku filozof odkłada widelce, dzięki czemu inni filozofowie mogą je podnieść i zacząć jeść.
 
-ZASADY DZIAŁANIA:
+**Zasady działania:**
 1. Każdy filozof myśli, a następnie próbuje podnieść dwa widelce (po lewej i prawej stronie).
 2. Filozof czeka, aż oba widelce będą wolne.
 3. Jeśli oba widelce są dostępne, filozof rozpoczyna jedzenie.
 4. Po jedzeniu odkłada widelce i wraca do myślenia.
 5. Proces powtarza się 5 razy dla każdego filozofa.
 
-IMPLEMENTACJA:
-1. Każdy filozof jest oddzielnym wątkiem (std::thread).
-2. Stan filozofów (THINKING, HUNGRY, EATING) przechowywany w tablicy state[].
-3. Widelce są reprezentowane jako tablica forks[] (true = dostępne, false = zajęte).
-4. Synchronizacja bez mutex i semaphorów, oparta wyłącznie na zmiennych stanu.
+**Implementacja**
+1. Każdy filozof działa jako osobny wątek (std::thread).
+
+2. Stany filozofów (THINKING, HUNGRY, EATING) są przechowywane w tablicy state[].
+
+3. Dostęp do widelców jest synchronizowany za pomocą std::mutex.
+
+4. Filozofowie czekają na dostęp do widelców przy użyciu std::condition_variable, co pozwala uniknąć aktywnego oczekiwania (busy waiting).
+
 
 **Struktura klasy DiningPhilosophers**
 - `int numPhilosophers` – Liczba filozofów
@@ -61,7 +65,7 @@ IMPLEMENTACJA:
 
 
 
-Uwzględnione wymagania projektowe:
+**Uwzględnione wymagania projektowe:**
 
 1. Raportowanie stanu w konsoli
 1. Brak trwałego zablokowania (deadlock)
